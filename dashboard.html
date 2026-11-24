@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Visão geral{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">RESUMO DO ESTOQUE</p><h1>Visão geral</h1><p class="muted">Acompanhe os indicadores e a atividade recente.</p></div>
+  <a class="button button-primary" href="{{ url_for('movements') }}">＋ Registrar movimentação</a>
+</div>
+
+<div class="stats-grid">
+  <article class="stat-card"><span class="stat-icon icon-violet">▦</span><div><p>Produtos cadastrados</p><strong>{{ totals["produtos"] }}</strong></div><span class="stat-foot">itens diferentes</span></article>
+  <article class="stat-card"><span class="stat-icon icon-green">◈</span><div><p>Unidades em estoque</p><strong>{{ totals["unidades"] }}</strong></div><span class="stat-foot">unidades disponíveis</span></article>
+  <article class="stat-card"><span class="stat-icon icon-blue">R$</span><div><p>Valor em estoque</p><strong class="stat-money">{{ totals["valor_estoque"]|currency }}</strong></div><span class="stat-foot">a preço de custo</span></article>
+</div>
+
+<div class="content-grid">
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Estoque baixo</h2><p class="muted">Produtos com {{ low_stock_limit }} unidades ou menos</p></div><span class="count-badge {% if low_stock %}count-warning{% endif %}">{{ low_stock|length }}</span></div>
+    {% if low_stock %}
+    <div class="table-wrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Quantidade</th></tr></thead><tbody>
+      {% for product in low_stock %}
+      <tr><td><strong>{{ product["nome"] }}</strong><span class="cell-sub">{{ product["codigo"] }}</span></td><td>{{ product["categoria"] }}</td><td><span class="quantity-pill quantity-low">{{ product["quantidade"] }} un.</span></td></tr>
+      {% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty-state"><span class="empty-icon">✓</span><strong>Estoque em dia</strong><p>Nenhum produto está abaixo do limite.</p></div>{% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Movimentações recentes</h2><p class="muted">Últimas entradas e saídas registradas</p></div><a class="text-link" href="{{ url_for('movements') }}">Ver todas →</a></div>
+    {% if recent %}
+    <div class="activity-list">
+      {% for movement in recent %}
+      <div class="activity-row">
+        <span class="movement-icon {% if movement['tipo'] == 'entrada' %}movement-in{% else %}movement-out{% endif %}">{% if movement["tipo"] == "entrada" %}↓{% else %}↑{% endif %}</span>
+        <div class="activity-info"><strong>{{ movement["produto_nome"] }}</strong><span>{{ movement["codigo"] }} · {{ movement["data"][:16] }}</span></div>
+        <span class="activity-quantity {% if movement['tipo'] == 'entrada' %}text-green{% else %}text-red{% endif %}">{% if movement["tipo"] == "entrada" %}+{% else %}−{% endif %}{{ movement["quantidade"] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}<div class="empty-state"><span class="empty-icon">⇄</span><strong>Sem movimentações</strong><p>Registre uma entrada ou saída para começar.</p></div>{% endif %}
+  </section>
+</div>
+{% endblock %}

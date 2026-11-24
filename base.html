@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Estoque{% endblock %} · Estoque</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard') }}">
+        <span class="brand-mark">E</span>
+        <span>Estoque<span class="brand-subtitle">CONTROLE SIMPLES</span></span>
+      </a>
+      <nav class="navigation" aria-label="Navegação principal">
+        <span class="nav-caption">MENU PRINCIPAL</span>
+        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>⌂</span> Visão geral</a>
+        <a class="nav-link {% if request.endpoint == 'products' %}active{% endif %}" href="{{ url_for('products') }}"><span>▦</span> Produtos</a>
+        <a class="nav-link {% if request.endpoint == 'movements' %}active{% endif %}" href="{{ url_for('movements') }}"><span>⇄</span> Movimentações</a>
+        <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}"><span>▤</span> Relatórios</a>
+      </nav>
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        <span>Banco de dados local<br><strong>SQLite conectado</strong></span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <span class="eyebrow">GESTÃO DE ESTOQUE</span>
+        <span class="topbar-label">Painel de controle</span>
+      </header>
+      <section class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-list" aria-live="polite">
+              {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </section>
+      <footer class="footer">Controle de estoque <span>·</span> Dados armazenados localmente</footer>
+    </main>
+  </div>
+</body>
+</html>

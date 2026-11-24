@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Movimentações{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">ENTRADAS E SAÍDAS</p><h1>Movimentações</h1><p class="muted">Registre compras, vendas ou uso de produtos.</p></div>
+</div>
+
+<section class="panel form-panel">
+  <div class="panel-heading"><div><h2>Nova movimentação</h2><p class="muted">O saldo do produto será atualizado automaticamente.</p></div></div>
+  {% if products %}
+  <form method="post" class="movement-form">
+    <label>Produto<select name="produto_id" required><option value="">Selecione um produto</option>{% for product in products %}<option value="{{ product['id'] }}" {% if request.form.get('produto_id') == product['id']|string %}selected{% endif %}>{{ product["codigo"] }} — {{ product["nome"] }} ({{ product["quantidade"] }} un.)</option>{% endfor %}</select></label>
+    <label>Tipo<select name="tipo" required><option value="">Selecione</option><option value="entrada" {% if request.form.get('tipo') == 'entrada' %}selected{% endif %}>Entrada · Compra</option><option value="saida" {% if request.form.get('tipo') == 'saida' %}selected{% endif %}>Saída · Venda/uso</option></select></label>
+    <label>Quantidade<input type="number" name="quantidade" min="1" step="1" required placeholder="Ex.: 10" value="{{ request.form.get('quantidade', '') }}"></label>
+    <label>Data <span class="optional">(opcional)</span><input type="date" name="data" value="{{ request.form.get('data', '') }}"></label>
+    <div class="form-action"><button class="button button-primary" type="submit">Registrar movimentação</button></div>
+  </form>
+  {% else %}<div class="empty-state"><span class="empty-icon">▦</span><strong>Cadastre um produto primeiro</strong><p>É necessário ter produtos para registrar movimentações.</p><a class="button button-primary" href="{{ url_for('products') }}">Ir para produtos</a></div>{% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><div><h2>Histórico</h2><p class="muted">Todas as movimentações registradas</p></div><span class="count-badge">{{ movements|length }}</span></div>
+  {% if movements %}
+  <div class="table-wrap"><table><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Quantidade</th></tr></thead><tbody>
+    {% for movement in movements %}
+    <tr><td>{{ movement["data"][:16] }}</td><td><strong>{{ movement["produto_nome"] }}</strong><span class="cell-sub">{{ movement["codigo"] }}</span></td><td><span class="type-badge {% if movement['tipo'] == 'entrada' %}type-in{% else %}type-out{% endif %}">{{ movement["tipo"]|title }}</span></td><td class="{% if movement['tipo'] == 'entrada' %}text-green{% else %}text-red{% endif %}"><strong>{% if movement["tipo"] == "entrada" %}+{% else %}−{% endif %}{{ movement["quantidade"] }} un.</strong></td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty-state"><span class="empty-icon">⇄</span><strong>Histórico vazio</strong><p>As movimentações registradas aparecerão aqui.</p></div>{% endif %}
+</section>
+{% endblock %}

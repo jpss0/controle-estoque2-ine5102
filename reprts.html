@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Relatórios{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">ANÁLISE</p><h1>Relatórios</h1><p class="muted">Visualize a composição e o valor atual do seu estoque.</p></div>
+  <a class="button button-primary" href="{{ url_for('export_csv') }}">↓ Exportar estoque CSV</a>
+</div>
+
+<div class="stats-grid stats-grid-compact">
+  <article class="stat-card"><span class="stat-icon icon-violet">▦</span><div><p>Produtos cadastrados</p><strong>{{ totals["produtos"] }}</strong></div></article>
+  <article class="stat-card"><span class="stat-icon icon-green">◈</span><div><p>Unidades no estoque</p><strong>{{ totals["unidades"] }}</strong></div></article>
+  <article class="stat-card"><span class="stat-icon icon-blue">R$</span><div><p>Valor total</p><strong class="stat-money">{{ totals["valor_estoque"]|currency }}</strong></div></article>
+</div>
+
+<section class="panel report-panel">
+  <div class="panel-heading"><div><h2>Unidades por categoria</h2><p class="muted">Quantidade disponível em cada categoria</p></div></div>
+  {% if categories %}
+  <div class="chart-list">
+    {% for category in categories %}
+    <div class="chart-row">
+      <div class="chart-label"><strong>{{ category["categoria"] }}</strong><span>{{ category["unidades"] }} un. <span class="chart-value">· {{ category["valor"]|currency }}</span></span></div>
+      <div class="chart-track" role="img" aria-label="{{ category['categoria'] }}: {{ category['unidades'] }} unidades"><span class="chart-bar" style="width: {{ (category['unidades'] / max_value * 100) if max_value else 0 }}%"></span></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}<div class="empty-state"><span class="empty-icon">▤</span><strong>Sem dados para exibir</strong><p>Cadastre produtos para visualizar o relatório.</p></div>{% endif %}
+</section>
+{% endblock %}
